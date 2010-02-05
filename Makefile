@@ -1,10 +1,4 @@
-SHELL := /bin/sh
-SRCDIR := $(shell pwd)
-DESTDIR := /usr/local/bin
-
-PROJECT_NAME=greth
-PROJECT_VERSION=0.1
-BINARY_NAME=${PROJECT_NAME}
+include config.mk
 
 all: ${BINARY_NAME}
 
