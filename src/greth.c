@@ -19,7 +19,7 @@
 
 #include "greth.h"
 
-void		print_usage(void)
+static void	print_usage(void)
 {
   printf("Usage: ...\n");
 }
@@ -42,7 +42,7 @@ greth_conf_t	config;
  *
  * Returns 0 upon success, and exits when an unknown option is given.
  */
-int		treat_options(int argc, char** argv)
+static int	treat_options(int argc, char** argv)
 {
   int		option = 0;
 
@@ -87,63 +87,6 @@ int		treat_options(int argc, char** argv)
 	   config.verbose, config.big_endian);
     
   return (0);
-}
-
-/**
- * Initiate a connection to the ethernet IP and update the corresponding field
- * in the config structure.
- *
- * Returns 0 on success, the error value otherwize.
- */
-int			create_connection(void)
-{
-  struct addrinfo       hints;
-  struct addrinfo*      serv_info;
-
-  memset(&hints, 0, sizeof (struct addrinfo));
-
-  /* It's a UDP connection */
-  hints.ai_family = AF_INET;
-  hints.ai_socktype = SOCK_DGRAM;
-  
-  getaddrinfo(config.ip, "42", &hints, &serv_info);
-
-  /* Open the socket */
-  if ((config.socket = socket(serv_info->ai_family, 
-			      serv_info->ai_socktype, 
-			      serv_info->ai_protocol)) == -1)
-    goto error_socket;
-
-  /* Initiate the connection */
-  if (connect(config.socket, serv_info->ai_addr, serv_info->ai_addrlen) == -1)
-    goto error_connect;
-
-  freeaddrinfo(serv_info);
-
-  if (config.verbose)
-    printf("Connection to the ethernet IP opened.\n");
-
-  return (0);
-
- error_connect:
-  close(config.socket);
- error_socket:
-  if (config.verbose)
-    printf("Error while trying to connect to the ethernet IP.\n");
-
-  return (errno);
-}
-
-/**
- * Properly close the connection initiated to the ethernet IP and set the
- * corresponding field in the config structure to -1.
- */
-void		close_connection(void)
-{
-  if (config.verbose)
-    printf("Connection closed.\n");
-
-  close(config.socket);
 }
 
 int		main(int argc, char** argv)

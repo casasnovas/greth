@@ -16,41 +16,16 @@
     You should have received a copy of the GNU General Public License
     along with greth. If not, see <http://www.gnu.org/licenses/>.
 */
+#ifndef CONNECT_H_
+# define CONNECT_H_
 
-#ifndef GRETH_H_
-# define GRETH_H_
+# include <sys/types.h>
+# include <sys/socket.h>
+# include <netdb.h>
 
-# include <unistd.h>
-# include <stdlib.h>
+# include "greth.h"
 
-# include <stdio.h>
-# include <getopt.h>
-# include <string.h>
+int	create_connection(void);
+void	close_connection(void);
 
-# include <errno.h>
-
-# include "connect.h"
-
-# define true			1
-# define false			0
-
-# define HOSTNAME_MAX_LENGTH	20
-
-# define BANNER					\
-  "/**\n"					\
-  " * greth - read/write dram memory\n"		\
-  " * \t by Quentin Casasnovas\n"		\
-  " */\n\n"
-
-typedef struct	greth_conf_t
-{
-  int		socket;
-  char		ip[HOSTNAME_MAX_LENGTH];
-  char		verbose;
-  char		big_endian;
-  unsigned long	memory_address;
-}		greth_conf_t;
-
-extern greth_conf_t config;
-
-#endif /* !GRETH_H_ */
+#endif /* !CONNECT_H_ */
