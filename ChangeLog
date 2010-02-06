@@ -1,0 +1,36 @@
+commit 8b3a78d95591ccde25a8c8d7334aee942baf7dcc
+Author: Quentin Casasnovas <quentin.casasnovas@gmail.com>
+Date:   Sat Feb 6 11:04:24 2010 +0100
+
+    * Little clean up in the build system
+    * The protocol edcl is now supported (not fully)
+      - Writing a file is supported
+      - Swaping bytes to big endian is also supported with the -g flag (for
+        compatibility reason with dcom)
+    * TODO
+      - Support the read function of the edcl protocol to be able to dump a memory
+        area
+
+commit 214f61eb06dbab25259d02d7538890d9f9e597ce
+Author: Quentin Casasnovas <quentin.casasnovas@gmail.com>
+Date:   Fri Feb 5 15:58:17 2010 +0100
+
+    * Reorganized the source code in multiple files to separate each component.
+
+commit 306efa98ec3c81f7d6d6d164624762e2f23021f9
+Author: Quentin Casasnovas <quentin.casasnovas@gmail.com>
+Date:   Fri Feb 5 15:44:50 2010 +0100
+
+    * Modified the build system
+      - All config variables are defined in config.mk
+    * Added first sources code files
+      - The program compiles and is able to connect to the ethernet IP with the UDP
+        protocol.
+    * TODO
+      - Implement the EDCL protocol to be able to read/write to the AHB bus.
+
+commit c3513891d165fc1c2fcc880ab7d71be05315f902
+Author: Quentin Casasnovas <quentin.casasnovas@gmail.com>
+Date:   Fri Feb 5 12:32:44 2010 +0100
+
+    * Initial commit
