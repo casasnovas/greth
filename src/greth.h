@@ -35,6 +35,7 @@
 # define false			0
 
 # define HOSTNAME_MAX_LENGTH	20
+# define FILENAME_MAX_LENGTH	32
 
 # define BANNER					\
   "/**\n"					\
@@ -46,10 +47,15 @@ typedef struct	greth_conf_t
 {
   int		socket;
   char		ip[HOSTNAME_MAX_LENGTH];
+  char		filename[FILENAME_MAX_LENGTH];
   char		verbose;
   char		big_endian;
   unsigned long	memory_address;
-}		greth_conf_t;
+  union {
+    void*		buffer;
+    char*		buffer_c;
+  };
+} greth_conf_t;
 
 extern greth_conf_t config;
 

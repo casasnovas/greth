@@ -1,7 +1,7 @@
 include ../config.mk
 
 $(BINARY_NAME): $(OBJECT_FILES)
-	$(CC) $(LDFLAGS) $^ -o $@
+	$(CC) $(LDFLAGS) $(CFLAGS) $^ -o $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@

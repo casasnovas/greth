@@ -1,12 +1,12 @@
 include config.mk
 
-all: ${BINARY_NAME}
+.PHONY: doc helper check $(BINARY_NAME)
 
-greth:
+all: $(BINARY_NAME)
+
+$(BINARY_NAME):
 	make -C src/
-	mv $(SRCDIR)/src/${BINARY_NAME} ./
-
-.PHONY: doc helper check
+	cp $(SRCDIR)/src/$(BINARY_NAME) ./
 
 doc:
 	doxygen Doxyfile

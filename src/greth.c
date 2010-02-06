@@ -27,10 +27,11 @@ static void	print_usage(void)
 static struct option l_opts[] =
   {
     {"ip",		required_argument,	0, 'i'},
+    {"file",		required_argument,	0, 'f'},
     {"help",		no_argument,		0, 'h'},
     {"verbose",		no_argument,		0, 'v'},
     {"big-endian",	no_argument,		0, 'g'},
-    {"memory-address",	no_argument,		0, 'm'},
+    {"memory-address",	required_argument,	0, 'm'},
     {0,			0,			0,  0 }
   };
 
@@ -48,12 +49,12 @@ static int	treat_options(int argc, char** argv)
 
   memset(&config, 0x0, sizeof (greth_conf_t));
 
-  while ((option = getopt_long(argc, argv, "ghi:mv", l_opts, NULL)) != EOF)
+  while ((option = getopt_long(argc, argv, "f:ghi:m:v", l_opts, NULL)) != EOF)
     {
       switch (option)
 	{
-	case 'i':
-	  strncpy(config.ip, optarg, HOSTNAME_MAX_LENGTH);
+	case 'f':
+	  strncpy(config.filename, optarg, FILENAME_MAX_LENGTH);
 	  break;
 	case 'g':
 	  config.big_endian = true;
@@ -61,6 +62,9 @@ static int	treat_options(int argc, char** argv)
 	case 'h':
 	  print_usage();
 	  exit (0);
+	  break;
+	case 'i':
+	  strncpy(config.ip, optarg, HOSTNAME_MAX_LENGTH);
 	  break;
 	case 'm':
 	  config.memory_address = strtoul(optarg, NULL, 0);
@@ -76,6 +80,13 @@ static int	treat_options(int argc, char** argv)
 	}
     } /* getopt_long(...) != EOF */
 
+  if (config.memory_address == 0)
+    goto error_missing_address;
+  else if (config.filename[0] == 0)
+    goto error_missing_filename;
+  else if (config.ip[0] == 0)
+    goto error_missing_ip;
+
   if (config.verbose)
     printf(BANNER
 	   "Configuration :\n"
@@ -87,6 +98,16 @@ static int	treat_options(int argc, char** argv)
 	   config.verbose, config.big_endian);
     
   return (0);
+
+ error_missing_ip:
+  printf("Error missing IP.\n");
+  return (2);
+ error_missing_address:
+  printf("Error missing memory address.\n");
+  return (2);
+ error_missing_filename:
+  printf("Error missing filename.\n");
+  return (2);
 }
 
 int		main(int argc, char** argv)
@@ -97,6 +118,9 @@ int		main(int argc, char** argv)
     goto error;
 
   if ((err_num = create_connection()) != 0)
+    goto error;
+
+  if ((err_num = send_file()) != 0)
     goto error;
 
   close_connection();
