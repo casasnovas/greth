@@ -2,10 +2,10 @@ SRCDIR		= $(shell pwd)
 DESTDIR		= /usr/local/bin
 
 CC		= gcc
-#CFLAGS		= -O2 -fomit-frame-pointer
 CFLAGS		= -g -ggdb -D __DEBUG
 LDFLAGS		=
 SHELL		= /bin/sh
+#CFLAGS		= -O2 -fomit-frame-pointer
 
 PROJECT_NAME	= greth
 PROJECT_VERSION = 0.1
