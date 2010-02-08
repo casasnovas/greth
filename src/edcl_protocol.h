@@ -30,7 +30,16 @@
   (File_size) = ftell((Fd));			\
   rewind((Fd));
 
-# define to_big_endian(Nb)			\
+# define set_operation(Layer_Field, Operation)	\
+  (Layer_Field) = (Layer_Field) | ((Operation & 0x1) << 17);
+
+# define set_length(Layer_Field, File_Size)	\
+  (Layer_Field) = (Layer_Field) | ((File_Size & 0x3ff) << 7);
+
+# define to_big_endian_16(Nb)			\
+  ((((Nb) & 0xff) << 8)	| (((Nb) & 0xff00) >> 8))
+
+# define to_big_endian_32(Nb)			\
   ((((Nb) & 0xff) << 24)	|		\
    (((Nb) & 0xff00) << 8)	|		\
    (((Nb) & 0xff0000) >> 8)	|		\
@@ -40,10 +49,11 @@
 typedef struct	edcl_paquet_t
 {
   unsigned int	offset:16;	/* Needed to align to word boundaries */
-  unsigned int	sequence:14;
-  unsigned int	operation:1;	/* READ_OP || WRITE_OP */
-  unsigned int	length:10;	/* Size of the datas */
-  unsigned int	unused:7;	/* Unused bits to align */
+  unsigned int	layer_field:32;
+  /* unsigned int	sequence:14; */
+  /* unsigned int	operation:1;	/\* READ_OP || WRITE_OP *\/ */
+  /* unsigned int	length:10;	/\* Size of the datas *\/ */
+  /* unsigned int	unused:7;	/\* Unused bits to align *\/ */
   unsigned int	address:32;	/* Address in memory to read/write to/from */
 } __attribute__ ((packed)) edcl_paquet_t;
 

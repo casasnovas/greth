@@ -54,6 +54,7 @@ typedef struct	greth_conf_t
   union {
     void*		buffer;
     char*		buffer_c;
+    unsigned int*	buffer_i;
   };
 } greth_conf_t;
 

@@ -36,7 +36,7 @@ int			create_connection(void)
   hints.ai_family = AF_INET;
   hints.ai_socktype = SOCK_DGRAM;
   
-  getaddrinfo(config.ip, "42", &hints, &serv_info);
+  getaddrinfo(config.ip, "41491", &hints, &serv_info);
 
   /* Open the socket */
   if ((config.socket = socket(serv_info->ai_family, 
