@@ -40,9 +40,12 @@
 
 # define BANNER					\
   "/**\n"					\
-  " * greth - read/write dram memory\n"		\
+  " * greth - read/write from/to ahb bus\n"	\
   " * \t by Quentin Casasnovas\n"		\
   " */\n\n"
+
+# define min(A, B)	((A) < (B) ? (A) : (B))
+# define max(A, B)	((A) > (B) ? (A) : (B))
 
 typedef struct		greth_conf_t
 {
@@ -51,12 +54,9 @@ typedef struct		greth_conf_t
   char			filename[FILENAME_MAX_LENGTH];
   char			verbose;
   char			big_endian;
-  unsigned long		memory_address;
-  union 
-  {
-    void*		buffer;
-    edcl_paquet_t*	paquet;
-  };
+  unsigned int		memory_address;
+  unsigned int		data_size;
+  unsigned int*		data;
 } greth_conf_t;
 
 extern greth_conf_t config;

@@ -20,12 +20,76 @@
 #include "edcl_protocol.h"
 
 /**
+ * Send an edcl paquet and fragment it if max_paquet_size < data_size
+ */
+static int		send_fragmented(void)
+{
+  unsigned int		address_offset = 0;
+  unsigned int		nb_sent_paquet = 0;
+  unsigned int		local_data_size = config.data_size;
+  edcl_paquet_t*	paquet = NULL;
+  
+  /* Allocating the paquet of the paquet */
+  paquet =
+    calloc(1, min(local_data_size, MAX_DATA_SIZE) + sizeof (edcl_header_t));
+  if (paquet == NULL)
+    goto error_malloc;
+
+  do 
+  {
+    /* Filling up the edcl header */
+    clear_header(paquet->header);
+    set_operation(paquet->header, WRITE_OP);
+    set_address(paquet->header, config.memory_address + address_offset);
+    set_length(paquet->header, min(local_data_size, MAX_DATA_SIZE));
+    if (config.verbose)
+      printf("\t %d paquet has a size of: %do.\n", 
+	     nb_sent_paquet, 
+	     min(local_data_size, MAX_DATA_SIZE));
+
+    /* Copying the data in the paquet */
+    memcpy(paquet->data,
+	   config.data + address_offset, 
+	   min(local_data_size, MAX_DATA_SIZE));
+
+    /* Sending the paquet to the ethernet IP */
+    if (send(config.socket, 
+	     paquet,
+	     min(local_data_size, MAX_DATA_SIZE) + sizeof (edcl_header_t), 0)
+	== -1)
+      goto error_send;
+
+    address_offset += min(local_data_size, MAX_DATA_SIZE);
+    local_data_size -= min(local_data_size, MAX_DATA_SIZE); 
+    ++nb_sent_paquet;
+  } while (local_data_size > 0);
+
+  if (config.verbose)
+    printf("The file has been fragmented in %d paquets.\n", nb_sent_paquet);
+
+  /* Releasing ressources */
+  free(paquet);
+
+  return (0);
+
+ error_send:
+  if (config.verbose)
+    printf("Error while sending the paquet.\n");
+  free(paquet);
+  return (-1);
+ error_malloc:
+  if (config.verbose)
+    printf("Unable to allocate the paquet.\n");
+  return (-1);
+}
+
+/**
  * Convert bytes from little endian to big endian
  *
  * data: a pointer to an array of int to be swapped
  * data_size: number of elements to be swapped
  */
-static void		swap_bytes(unsigned int*	data_i,
+static inline void	swap_bytes(unsigned int*	data_i,
 				   unsigned int		data_size)
 {
   unsigned int		i = 0;
@@ -35,12 +99,31 @@ static void		swap_bytes(unsigned int*	data_i,
 }
 
 /**
- * Send a file to be written in dram
+ * Retreive the size of the file pointed to by fd and store it in
+ * file_size. file_size will always be a multiple of 4 so file_size may be
+ * bigger than the real file_size.
+ *
+ * file_size: a pointer where to store the real file size.
+ * fd: a file descriptor which points to the file we're probing the size
+ */
+static inline void	get_file_size(unsigned int*	file_size,
+				      FILE*		fd)
+{
+  fseek(fd, 0, SEEK_END);
+  *file_size = (unsigned int) ftell(fd);
+  rewind(fd);
+
+  /* We assure that file_size % 4 == 0 */
+  if (*file_size & 0x3)
+    *file_size = (*file_size + 0x4) & ~0x3;
+}
+
+/**
+ * Send a file to be written at config.memory_address
  */
 int			send_file(void)
 {
   FILE*			fd = NULL;
-  unsigned int		file_size = 0;
 
   /* Open the file */
   if ((fd = fopen(config.filename, "r")) == NULL)
@@ -51,45 +134,40 @@ int			send_file(void)
   if (config.verbose)
     printf("File %s has been opened.\n", config.filename);
 
-  get_file_size(file_size, fd);
+  /* Retreive file size */
+  get_file_size(&(config.data_size), fd);
   if (config.verbose)
-    printf("File size is: %d\t = 0x%08x \n", file_size, file_size);
+    printf("File size is: %d\n", config.data_size);
 
   /* Copy the file in memory */
-  if ((config.buffer = calloc(1, file_size + sizeof (edcl_header_t))) == NULL)
+  if ((config.data = calloc(1, config.data_size + sizeof (edcl_header_t))) == NULL)
     {
       printf("Error allocating memory.\n");
       goto error_malloc;
     }
-  fread(config.paquet->data_i, 1, file_size, fd);
+  fread(config.data, 1, config.data_size, fd);
   if (config.verbose)
     printf("File has been copied in memory.\n");
 
-  /* Fill the edcl header and swap to big endian (if big_endian flag is set) */
-  set_operation(config.paquet->header, WRITE_OP);
-  set_address(config.paquet->header, config.memory_address);
-  set_length(config.paquet->header, file_size);
+  /* Swap the file bytes if necessary */
   if (config.big_endian)
-    swap_bytes(config.paquet->data_i, file_size / 4);
+    swap_bytes(config.data, config.data_size / 4);
 
   /* Send the file over the socket */
-  if (send(config.socket,
-	   config.buffer,
-	   file_size + sizeof (edcl_header_t),
-	   0) == -1)
+  if (send_fragmented() != 0)
     goto error_send;
   if (config.verbose)
     printf("File has been sent to the ethernet IP.\n");
 
   /* Release ressources */
-  free(config.buffer);
+  free(config.data);
   fclose(fd);
 
   return (0);
 
  error_send:
   printf("Erreur lors de l'envoie du paquet.\n");
-  free(config.buffer);
+  free(config.data);
  error_malloc:
   printf("Erreur lors de l'allocation des données.\n");
   fclose(fd);

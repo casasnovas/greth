@@ -20,28 +20,15 @@
 #ifndef EDCL_PROTOCOL_H_
 # define EDCL_PROTOCOL_H_
 
-typedef struct		edcl_header_t
-{
-  unsigned short	offset;		/* Needed to align to word boundaries */
-  unsigned int		layer_field;	/* Contains the sequence, operation and length */
-  unsigned int		address;	/* Address in memory to read/write to/from */
-} __attribute__ ((packed)) edcl_header_t;
-
-typedef struct		edcl_paquet_t
-{
-  edcl_header_t		header;
-  unsigned int		data_i[];
-} __attribute__ ((packed)) edcl_paquet_t;
-
 # include "greth.h"
 
-# define READ_OP	0
-# define WRITE_OP	1
+# define READ_OP		0
+# define WRITE_OP		1
 
-# define get_file_size(File_size, Fd)		\
-  fseek((Fd), 0, SEEK_END);			\
-  (File_size) = (unsigned int) ftell((Fd));	\
-  rewind((Fd));
+# define MAX_DATA_SIZE		968
+
+# define clear_header(Edcl_Header)		\
+  bzero(&(Edcl_Header), sizeof (edcl_header_t));
 
 # define set_operation(Edcl_Header, Operation)	\
   (Edcl_Header).layer_field |= ((Operation & 0x1) << 9);
@@ -49,7 +36,7 @@ typedef struct		edcl_paquet_t
 # define set_length(Edcl_Header, File_Size)		\
   (Edcl_Header).layer_field		|=		\
     (((File_Size) & 0x001) >> 0 << 31)	|		\
-    (((File_Size) & 0x0fe) >> 1 << 16)	|		\
+    (((File_Size) & 0x1fe) >> 1 << 16)	|		\
     (((File_Size) & 0x200) >> 9 << 8) ;
 
 # define set_address(Edcl_Header, Address)		\
@@ -63,6 +50,19 @@ typedef struct		edcl_paquet_t
    (((Nb) & 0xff00) << 8)	|		\
    (((Nb) & 0xff0000) >> 8)	|		\
    (((Nb) & 0xff000000) >> 24))
+
+typedef struct		edcl_header_t
+{
+  unsigned short	offset;		/* Needed to align to word boundaries */
+  unsigned int		layer_field;	/* Contains the sequence, operation and length */
+  unsigned int		address;	/* Address in memory to read/write to/from */
+} __attribute__ ((packed)) edcl_header_t;
+
+typedef struct		edcl_paquet_t
+{
+  edcl_header_t		header;		/* The edcl header */
+  unsigned int		data[];		/* The datas we're sending */
+} __attribute__ ((packed)) edcl_paquet_t;
 
 int		send_file(void);
 
