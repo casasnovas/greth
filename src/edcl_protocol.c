@@ -19,14 +19,19 @@
 
 #include "edcl_protocol.h"
 
-static void		swap_bytes(unsigned int filesize)
+/**
+ * Convert bytes from little endian to big endian
+ *
+ * data: a pointer to an array of int to be swapped
+ * data_size: number of elements to be swapped
+ */
+static void		swap_bytes(unsigned int*	data_i,
+				   unsigned int		data_size)
 {
   unsigned int		i = 0;
-  unsigned int*		buffer_i =
-    (unsigned int*) (config.buffer_c + sizeof (edcl_paquet_t));
 
-  for (i = 0; i < ((filesize) / 4); ++i)
-    buffer_i[i] = to_big_endian_32(buffer_i[i]);
+  for (i = 0; i < data_size; ++i)
+    data_i[i] = to_big_endian_32(data_i[i]);
 }
 
 /**
@@ -36,7 +41,6 @@ int			send_file(void)
 {
   FILE*			fd = NULL;
   unsigned int		file_size = 0;
-  edcl_paquet_t*	edcl_paquet = NULL;
 
   /* Open the file */
   if ((fd = fopen(config.filename, "r")) == NULL)
@@ -52,40 +56,28 @@ int			send_file(void)
     printf("File size is: %d\t = 0x%08x \n", file_size, file_size);
 
   /* Copy the file in memory */
-  if ((config.buffer = calloc(1, file_size + sizeof (edcl_paquet_t))) == NULL)
+  if ((config.buffer = calloc(1, file_size + sizeof (edcl_header_t))) == NULL)
     {
       printf("Error allocating memory.\n");
       goto error_malloc;
     }
-  fread(config.buffer_c + sizeof (edcl_paquet_t), 1, file_size, fd);
+  fread(config.paquet->data_i, 1, file_size, fd);
   if (config.verbose)
     printf("File has been copied in memory.\n");
 
-  /* Fill the edcl header and swap to big endian */
-  edcl_paquet			= config.buffer;
-  edcl_paquet->offset		= 0;
-  set_operation(edcl_paquet->layer_field, WRITE_OP);
-  set_length(edcl_paquet->layer_field, file_size);
-  edcl_paquet->address		= to_big_endian_32(config.memory_address);
-
-  /* Swap bytes to big endian if the flag is active */
+  /* Fill the edcl header and swap to big endian (if big_endian flag is set) */
+  set_operation(config.paquet->header, WRITE_OP);
+  set_address(config.paquet->header, config.memory_address);
+  set_length(config.paquet->header, file_size);
   if (config.big_endian)
-    swap_bytes(file_size);
+    swap_bytes(config.paquet->data_i, file_size / 4);
 
   /* Send the file over the socket */
   if (send(config.socket,
 	   config.buffer,
-	   file_size + sizeof (edcl_paquet_t),
+	   file_size + sizeof (edcl_header_t),
 	   0) == -1)
     goto error_send;
-
-#ifdef __DEBUG
-  printf("0x%04hx\t0x%08x\t0x%08x.\n",
-	 (edcl_paquet->offset),
-	 (edcl_paquet->layer_field),
-	 (edcl_paquet->address));
-#endif
-
   if (config.verbose)
     printf("File has been sent to the ethernet IP.\n");
 

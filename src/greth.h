@@ -30,6 +30,7 @@
 # include <errno.h>
 
 # include "connect.h"
+# include "edcl_protocol.h"
 
 # define true			1
 # define false			0
@@ -43,18 +44,18 @@
   " * \t by Quentin Casasnovas\n"		\
   " */\n\n"
 
-typedef struct	greth_conf_t
+typedef struct		greth_conf_t
 {
-  int		socket;
-  char		ip[HOSTNAME_MAX_LENGTH];
-  char		filename[FILENAME_MAX_LENGTH];
-  char		verbose;
-  char		big_endian;
-  unsigned long	memory_address;
-  union {
+  int			socket;
+  char			ip[HOSTNAME_MAX_LENGTH];
+  char			filename[FILENAME_MAX_LENGTH];
+  char			verbose;
+  char			big_endian;
+  unsigned long		memory_address;
+  union 
+  {
     void*		buffer;
-    char*		buffer_c;
-    unsigned int*	buffer_i;
+    edcl_paquet_t*	paquet;
   };
 } greth_conf_t;
 

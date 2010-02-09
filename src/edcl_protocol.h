@@ -1,4 +1,4 @@
-/*  ABCDEFGHIJKL
+/*  
     (c) Quentin Casasnovas (quentin.casasnovas@gmail.com)
 
     This file is part of greth.
@@ -20,6 +20,19 @@
 #ifndef EDCL_PROTOCOL_H_
 # define EDCL_PROTOCOL_H_
 
+typedef struct		edcl_header_t
+{
+  unsigned short	offset;		/* Needed to align to word boundaries */
+  unsigned int		layer_field;	/* Contains the sequence, operation and length */
+  unsigned int		address;	/* Address in memory to read/write to/from */
+} __attribute__ ((packed)) edcl_header_t;
+
+typedef struct		edcl_paquet_t
+{
+  edcl_header_t		header;
+  unsigned int		data_i[];
+} __attribute__ ((packed)) edcl_paquet_t;
+
 # include "greth.h"
 
 # define READ_OP	0
@@ -30,14 +43,17 @@
   (File_size) = (unsigned int) ftell((Fd));	\
   rewind((Fd));
 
-# define set_operation(Layer_Field, Operation)	\
-  (Layer_Field) |= ((Operation & 0x1) << 9);
+# define set_operation(Edcl_Header, Operation)	\
+  (Edcl_Header).layer_field |= ((Operation & 0x1) << 9);
 
-# define set_length(Layer_Field, File_Size)		\
-  (Layer_Field) |=					\
+# define set_length(Edcl_Header, File_Size)		\
+  (Edcl_Header).layer_field		|=		\
     (((File_Size) & 0x001) >> 0 << 31)	|		\
     (((File_Size) & 0x0fe) >> 1 << 16)	|		\
     (((File_Size) & 0x200) >> 9 << 8) ;
+
+# define set_address(Edcl_Header, Address)		\
+  (Edcl_Header).address = to_big_endian_32(Address);
 
 # define to_big_endian_16(Nb)			\
   ((((Nb) & 0xff) << 8)	| (((Nb) & 0xff00) >> 8))
@@ -47,13 +63,6 @@
    (((Nb) & 0xff00) << 8)	|		\
    (((Nb) & 0xff0000) >> 8)	|		\
    (((Nb) & 0xff000000) >> 24))
-
-typedef struct		edcl_paquet_t
-{
-  unsigned short	offset;		/* Needed to align to word boundaries */
-  unsigned int		layer_field;
-  unsigned int		address;	/* Address in memory to read/write to/from */
-} __attribute__ ((packed)) edcl_paquet_t;
 
 int		send_file(void);
 
