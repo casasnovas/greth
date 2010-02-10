@@ -56,7 +56,11 @@ typedef struct		greth_conf_t
   char			big_endian;
   unsigned int		memory_address;
   unsigned int		data_size;
-  unsigned int*		data;
+  union
+  {
+    unsigned int*		data;
+    unsigned char*		data_c;
+  };
 } greth_conf_t;
 
 extern greth_conf_t config;

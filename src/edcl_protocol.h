@@ -25,22 +25,27 @@
 # define READ_OP		0
 # define WRITE_OP		1
 
-# define MAX_DATA_SIZE		968
+# define MAX_DATA_SIZE		32
 
 # define clear_header(Edcl_Header)		\
-  bzero(&(Edcl_Header), sizeof (edcl_header_t));
+  bzero(&(Edcl_Header), sizeof (edcl_header_t))
 
 # define set_operation(Edcl_Header, Operation)	\
   (Edcl_Header).layer_field |= ((Operation & 0x1) << 9);
+
+# define set_sequence(Edcl_Header, Counter)	\
+  (Edcl_Header).layer_field	|=		\
+    (((Counter) & 0x3f) << 10)	|		\
+    (((Counter) & 0x3fc0) >> 6)
 
 # define set_length(Edcl_Header, File_Size)		\
   (Edcl_Header).layer_field		|=		\
     (((File_Size) & 0x001) >> 0 << 31)	|		\
     (((File_Size) & 0x1fe) >> 1 << 16)	|		\
-    (((File_Size) & 0x200) >> 9 << 8) ;
+    (((File_Size) & 0x200) >> 9 << 8)
 
 # define set_address(Edcl_Header, Address)		\
-  (Edcl_Header).address = to_big_endian_32(Address);
+  (Edcl_Header).address = to_big_endian_32(Address)
 
 # define to_big_endian_16(Nb)			\
   ((((Nb) & 0xff) << 8)	| (((Nb) & 0xff00) >> 8))

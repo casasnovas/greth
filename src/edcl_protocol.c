@@ -40,16 +40,13 @@ static int		send_fragmented(void)
     /* Filling up the edcl header */
     clear_header(paquet->header);
     set_operation(paquet->header, WRITE_OP);
+    set_sequence(paquet->header, nb_sent_paquet);
     set_address(paquet->header, config.memory_address + address_offset);
     set_length(paquet->header, min(local_data_size, MAX_DATA_SIZE));
-    if (config.verbose)
-      printf("\t %d paquet has a size of: %do.\n", 
-	     nb_sent_paquet, 
-	     min(local_data_size, MAX_DATA_SIZE));
 
     /* Copying the data in the paquet */
     memcpy(paquet->data,
-	   config.data + address_offset, 
+	   config.data_c + address_offset, 
 	   min(local_data_size, MAX_DATA_SIZE));
 
     /* Sending the paquet to the ethernet IP */
@@ -62,6 +59,7 @@ static int		send_fragmented(void)
     address_offset += min(local_data_size, MAX_DATA_SIZE);
     local_data_size -= min(local_data_size, MAX_DATA_SIZE); 
     ++nb_sent_paquet;
+    usleep(100);
   } while (local_data_size > 0);
 
   if (config.verbose)
@@ -96,6 +94,8 @@ static inline void	swap_bytes(unsigned int*	data_i,
 
   for (i = 0; i < data_size; ++i)
     data_i[i] = to_big_endian_32(data_i[i]);
+
+  printf("Bytes have been swapped to big endian.\n");
 }
 
 /**
@@ -152,6 +152,10 @@ int			send_file(void)
   /* Swap the file bytes if necessary */
   if (config.big_endian)
     swap_bytes(config.data, config.data_size / 4);
+
+#ifdef __DEBUG
+  /* write(1, config.data, config.data_size); */
+#endif
 
   /* Send the file over the socket */
   if (send_fragmented() != 0)
