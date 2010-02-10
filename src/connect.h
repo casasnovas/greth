@@ -26,6 +26,9 @@
 
 # include "greth.h"
 
+/*
+ * Exported functions
+ */
 int	create_connection(void);
 void	close_connection(void);
 

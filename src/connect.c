@@ -25,33 +25,26 @@
  *
  * Returns 0 on success, the error value otherwize.
  */
-int			create_connection(void)
+int			create_connections(void)
 {
+  unsigned short int	source_port;
   struct addrinfo       hints;
-  struct addrinfo*      serv_info;
-
-  memset(&hints, 0, sizeof (struct addrinfo));
 
   /* It's a UDP connection */
+  memset(&hints, 0, sizeof (struct addrinfo));
   hints.ai_family = AF_INET;
   hints.ai_socktype = SOCK_DGRAM;
-  
-  getaddrinfo(config.ip, "41491", &hints, &serv_info);
+  getaddrinfo(config.ip, "4242", &hints, &(config.serv_info));
 
-  /* Open the socket */
-  if ((config.socket = socket(serv_info->ai_family, 
-			      serv_info->ai_socktype, 
-			      serv_info->ai_protocol)) == -1)
+  /* Create the socket */
+  if ((config.socket = socket(config.serv_info->ai_family, 
+			      config.serv_info->ai_socktype, 
+			      config.serv_info->ai_protocol)) == -1)
     goto error_socket;
 
-  /* Initiate the connection */
-  if (connect(config.socket, serv_info->ai_addr, serv_info->ai_addrlen) == -1)
-    goto error_connect;
-
-  freeaddrinfo(serv_info);
-
   if (config.verbose)
-    printf("Connection to the ethernet IP opened.\n");
+    fprintf(stderr,
+	    "Connection to the ethernet IP opened.\n");
 
   return (0);
 
@@ -59,8 +52,8 @@ int			create_connection(void)
   close(config.socket);
  error_socket:
   if (config.verbose)
-    printf("Error while trying to connect to the ethernet IP.\n");
-
+    fprintf(stderr,
+	    "Error while trying to connect to the ethernet IP.\n");
   return (errno);
 }
 
@@ -68,10 +61,13 @@ int			create_connection(void)
  * Properly close the connection initiated to the ethernet IP and set the
  * corresponding field in the config structure to -1.
  */
-void		close_connection(void)
+void		close_connections(void)
 {
   if (config.verbose)
-    printf("Connection closed.\n");
+    fprintf(stderr,
+	    "Connection closed.\n");
+
+  freeaddrinfo(config.serv_info);
 
   close(config.socket);
 }

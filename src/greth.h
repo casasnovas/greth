@@ -36,26 +36,39 @@
 # define false			0
 
 # define HOSTNAME_MAX_LENGTH	20
-# define FILENAME_MAX_LENGTH	32
-
+# define FILENAME_MAX_LENGTH	64
 # define BANNER					\
   "/**\n"					\
   " * greth - read/write from/to ahb bus\n"	\
   " * \t by Quentin Casasnovas\n"		\
   " */\n\n"
 
+# define WRITE_ACTION		1
+# define READ_ACTION		2
+
+/*
+ * Arch not specific macros function
+ */
+
 # define min(A, B)	((A) < (B) ? (A) : (B))
 # define max(A, B)	((A) > (B) ? (A) : (B))
+
+/*
+ * Types
+ */
 
 typedef struct		greth_conf_t
 {
   int			socket;
   char			ip[HOSTNAME_MAX_LENGTH];
   char			filename[FILENAME_MAX_LENGTH];
+  char			action;
   char			verbose;
   char			big_endian;
   unsigned int		memory_address;
   unsigned int		data_size;
+  unsigned int		word;
+  struct addrinfo*	serv_info;
   union
   {
     unsigned int*		data;

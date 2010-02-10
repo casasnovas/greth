@@ -24,14 +24,26 @@
 
 # define READ_OP		0
 # define WRITE_OP		1
+# define MAX_DATA_SIZE		968
 
-# define MAX_DATA_SIZE		32
+/*
+ * Arch not-specific macros function
+ */
 
 # define clear_header(Edcl_Header)		\
   bzero(&(Edcl_Header), sizeof (edcl_header_t))
 
+/*
+ * Arch specific macros function
+ */
+# define get_ack(Edcl_Header)			\
+  !((to_big_endian_32((Edcl_Header).layer_field) & 0x20000) >> 17)
+
+# define get_sequence(Edcl_Header)		\
+  (to_big_endian_32((Edcl_Header).layer_field) >> 18)
+
 # define set_operation(Edcl_Header, Operation)	\
-  (Edcl_Header).layer_field |= ((Operation & 0x1) << 9);
+  (Edcl_Header).layer_field |= ((Operation & 0x1) << 9)
 
 # define set_sequence(Edcl_Header, Counter)	\
   (Edcl_Header).layer_field	|=		\
@@ -56,6 +68,10 @@
    (((Nb) & 0xff0000) >> 8)	|		\
    (((Nb) & 0xff000000) >> 24))
 
+/*
+ * Types
+ */
+
 typedef struct		edcl_header_t
 {
   unsigned short	offset;		/* Needed to align to word boundaries */
@@ -63,12 +79,18 @@ typedef struct		edcl_header_t
   unsigned int		address;	/* Address in memory to read/write to/from */
 } __attribute__ ((packed)) edcl_header_t;
 
-typedef struct		edcl_paquet_t
+typedef struct		edcl_packet_t
 {
   edcl_header_t		header;		/* The edcl header */
   unsigned int		data[];		/* The datas we're sending */
-} __attribute__ ((packed)) edcl_paquet_t;
+} __attribute__ ((packed)) edcl_packet_t;
+
+
+/*
+ * Exported functions
+ */
 
 int		send_file(void);
+int		send_word(void);
 
 #endif /* !EDCL_PROTOCOL_H_ */
