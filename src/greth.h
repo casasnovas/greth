@@ -65,6 +65,7 @@ typedef struct		greth_conf_t
   char			action;
   char			verbose;
   char			big_endian;
+  char			check_copy;
   unsigned int		memory_address;
   unsigned int		data_size;
   unsigned int		word;

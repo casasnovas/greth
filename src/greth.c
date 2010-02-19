@@ -27,19 +27,20 @@ static void	print_usage(const char*	binary_name)
 {
   fprintf(stderr,
 	  "Usage: "
-	 "\t%s read --ip/-i ip_address "
-	 "\n\t\t [--memory-address/-m memory_address] (default to 0x40000000)"
-	 "\n\t\t [--length/-l length] (default to 4)"
-	 "\n\t\t [--big-endian/-b] "
-	 "\n\t\t [--verbose/-v]\n"
-	 "or: "
-	 "\t%s write --ip/-i ip_address "
-	 "\n\t\t [--memory-address/-m memory_address] (default to 0x40000000)"
-	 "\n\t\t [[--file/-f filename]/[--word/-w word_value]] (default to -w 0x1234CAFE)"
-	 "\n\t\t [--big-endian/-b] "
-	 "\n\t\t [--verbose/-v]\n"
-	 "or: "
-	 "\t%s --help/-h\n",
+	  "\t%s read --ip/-i ip_address "
+	  "\n\t\t [--memory-address/-m memory_address] (default to 0x40000000)"
+	  "\n\t\t [--length/-l length] (default to 4)"
+	  "\n\t\t [--big-endian/-b] "
+	  "\n\t\t [--verbose/-v]\n"
+	  "or: "
+	  "\t%s write --ip/-i ip_address "
+	  "\n\t\t [--memory-address/-m memory_address] (default to 0x40000000)"
+	  "\n\t\t [[--file/-f filename]/[--word/-w word_value]] (default to -w 0x1234CAFE)"
+	  "\n\t\t [--check-copy/-c] "
+	  "\n\t\t [--big-endian/-b] "
+	  "\n\t\t [--verbose/-v]\n"
+	  "or: "
+	  "\t%s --help/-h\n",
 	 binary_name, binary_name, binary_name);
 }
 
@@ -87,6 +88,7 @@ static struct option l_opts[] =
     {"length",		required_argument,	0, 'l'},
     {"verbose",		no_argument,		0, 'v'},
     {"big-endian",	no_argument,		0, 'b'},
+    {"check-copy",	no_argument,		0, 'c'},
     {"memory-address",	required_argument,	0, 'm'},
     {0,			0,			0,  0 }
   };
@@ -130,6 +132,8 @@ static int	treat_options(int argc, char** argv)
 	  break;
 	case 'b':
 	  config.big_endian = true;
+	  break;
+	case 'c':
 	  break;
 	case 'h':
 	  print_usage(argv[0]);

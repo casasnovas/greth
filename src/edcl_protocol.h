@@ -24,7 +24,7 @@
 
 # define READ_OP		0
 # define WRITE_OP		1
-# define MAX_DATA_SIZE		968
+# define MAX_DATA_SIZE		456
 
 /*
  * Arch not-specific macros function

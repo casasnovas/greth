@@ -74,7 +74,9 @@ static int		send_fragmented(void)
 
     if (config.verbose)
       fprintf(stderr,
-	      " Trying to write at 0x%08x.\n", config.memory_address + address_offset);
+	      " [%d] Trying to write at 0x%08x.",
+	      sequence_number,
+	      config.memory_address + address_offset);
 
     /* Copying the data in the packet */
     memcpy(packet->data,
@@ -95,23 +97,28 @@ static int		send_fragmented(void)
     		 0, NULL, 0) == -1)
       goto error_recvfrom;
 
-  /* We've been aknowledge, keep sending */
-  if (get_ack(packet->header))
-    {
-      address_offset += min(local_data_size, MAX_DATA_SIZE);
-      local_data_size -= min(local_data_size, MAX_DATA_SIZE);
-      ++sequence;
-      ++nb_ack;
-    }
-  /* The sequence number was wrong, fix it */
-  else
-    {
-      if (config.verbose)
-	fprintf(stderr,
-		"  Wrong sequence number (%d) should be: %d.\n",
-		sequence, get_sequence(packet->header));
-      sequence = get_sequence(packet->header);
-    }
+    /* usleep(5000); */
+
+    /* We've been aknowledge, keep sending */
+    if (get_ack(packet->header))
+      {
+	if (config.verbose)
+	  fprintf(stderr,
+		  "\t[OK]\n");
+	address_offset += min(local_data_size, MAX_DATA_SIZE);
+	local_data_size -= min(local_data_size, MAX_DATA_SIZE);
+	++sequence_number;
+	++nb_ack_packet;
+      }
+    /* The sequence number was wrong, fix it */
+    else
+      {
+	if (config.verbose)
+	  fprintf(stderr,
+		  "\t[Failed]\n  Wrong sequence number (%d) should be: %d. Fixed.\n",
+		  sequence_number, get_sequence(packet->header));
+	sequence_number = get_sequence(packet->header);
+      }
 
     ++nb_sent_packet;
   } while (local_data_size > 0);
