@@ -1,20 +1,20 @@
 /*
-    (c) Quentin Casasnovas (quentin.casasnovas@gmail.com)
+  (c) Quentin Casasnovas (quentin.casasnovas@gmail.com)
 
-    This file is part of greth.
+  This file is part of greth.
 
-    greth is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 2 of the License, or
-    (at your option) any later version.
+  greth is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 2 of the License, or
+  (at your option) any later version.
 
-    greth is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  greth is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with greth. If not, see <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU General Public License
+  along with greth. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef GRETH_H_
@@ -37,14 +37,15 @@
 
 # define HOSTNAME_MAX_LENGTH	20
 # define FILENAME_MAX_LENGTH	64
-# define BANNER					\
-  "/**\n"					\
-  " * greth - read/write from/to ahb bus\n"	\
-  " * \t by Quentin Casasnovas\n"		\
-  " */\n\n"
+# define BANNER						\
+	"/**\n"						\
+	" * greth - read/write from/to ahb bus\n"	\
+	" * \t by Quentin Casasnovas\n"			\
+	" */\n\n"
 
 # define WRITE_ACTION		1
 # define READ_ACTION		2
+# define RUN_ACTION		3
 
 /*
  * Arch not specific macros function
@@ -57,26 +58,33 @@
  * Types
  */
 
-typedef struct		greth_conf_t
-{
-  int			socket;
-  char			ip[HOSTNAME_MAX_LENGTH];
-  char			filename[FILENAME_MAX_LENGTH];
-  char			action;
-  char			verbose;
-  char			big_endian;
-  char			check_copy;
-  unsigned int		memory_address;
-  unsigned int		data_size;
-  unsigned int		word;
-  struct addrinfo*	serv_info;
-  union
-  {
-    unsigned int*		data;
-    unsigned char*		data_c;
-  };
+typedef struct			greth_conf_t {
+	int			socket;
+	char			ip[HOSTNAME_MAX_LENGTH];
+	char			filename[FILENAME_MAX_LENGTH];
+	char			action;
+	char			verbose;
+	char			big_endian;
+	char			check_copy;
+	unsigned int		sequence_number;
+	unsigned int		run_address;
+	unsigned int		memory_address;
+	unsigned int		data_size;
+	unsigned int		word;
+	struct addrinfo*	serv_info;
+	union {
+		unsigned int*	data;
+		unsigned char*	data_c;
+	};
 } greth_conf_t;
 
-extern greth_conf_t config;
+typedef struct		grmon_command_t {
+	unsigned int	address;
+	unsigned int	value;
+}			grmon_command_t;
+
+extern greth_conf_t	config;
+extern grmon_command_t	gr_run_cmd[];
+extern grmon_command_t	gr_debug_cmd[];
 
 #endif /* !GRETH_H_ */

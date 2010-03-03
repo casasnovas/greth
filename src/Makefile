@@ -5,7 +5,7 @@ $(BINARY_NAME): $(OBJECT_FILES)
 	@$(CC) $(LDFLAGS) $(CFLAGS) $^ -o $@
 	@echo OK
 
-%.o: %.c %.h
+%.o: %.c
 	@echo -n "(CC)" $@ " "
 	@$(CC) $(CFLAGS) -c $< -o $@
 	@echo OK

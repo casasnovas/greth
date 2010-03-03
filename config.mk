@@ -12,6 +12,6 @@ PROJECT_VERSION = 0.1
 
 BINARY_NAME	= $(PROJECT_NAME)
 
-SOURCE_FILES	= greth.c connect.c edcl_protocol.c
+SOURCE_FILES	= greth.c connect.c edcl_protocol.c gr_run.c gr_debug.c
 
 OBJECT_FILES	= $(SOURCE_FILES:.c=.o)

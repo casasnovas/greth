@@ -1,14 +1,14 @@
-.___                 __         .__  .__   
-|   | ____   _______/  |______  |  | |  |  
-|   |/    \ /  ___/\   __\__  \ |  | |  |  
+.___                 __         .__  .__
+|   | ____   _______/  |______  |  | |  |
+|   |/    \ /  ___/\   __\__  \ |  | |  |
 |   |   |  \\___ \  |  |  / __ \|  |_|  |__
 |___|___|  /____  > |__| (____  /____/____/
-         \/     \/            \/           
+         \/     \/            \/
 
 1. Dependencies
 ~~~~~~~~~~~~~~~
 This program depends on the following librairies :
-     -
+     - libc
 
 2. Installation
 ~~~~~~~~~~~~~~~
@@ -18,10 +18,8 @@ directory containing the driver:
 As root:
   42sh$ make install
 
-
 3. What more ?
 ~~~~~~~~~~~~~~
-
   You probably want to check that greth is working correctly. To do so, try to
 flash something in ram (if you don't know how to use greth to do so, please
 refer to the README file), and you could use grmon to dump the memory to see at
@@ -36,11 +34,11 @@ If there is a problem not listed here, and all dependencies are installed on
 your computer, feel free to send me an e-mail with all details (the error, your
 distribution, your kernel version, etc).
 
- ____ ___      .__                 __         .__  .__   
-|    |   \____ |__| ____   _______/  |______  |  | |  |  
-|    |   /    \|  |/    \ /  ___/\   __\__  \ |  | |  |  
+ ____ ___      .__                 __         .__  .__
+|    |   \____ |__| ____   _______/  |______  |  | |  |
+|    |   /    \|  |/    \ /  ___/\   __\__  \ |  | |  |
 |    |  /   |  \  |   |  \\___ \  |  |  / __ \|  |_|  |__
 |______/|___|  /__|___|  /____  > |__| (____  /____/____/
-             \/        \/     \/            \/           
+             \/        \/     \/            \/
 As root, in the directory where you extracted the driver:
   42sh$ make uninstall
