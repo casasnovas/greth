@@ -1,6 +1,7 @@
 /* gr_run_cmd structure     */
 #include "greth.h"
 
+#ifdef _SCALEO
 grmon_command_t gr_run_cmd[] = {
 	{ 0x90400060, 0x0 },
 	{ 0x90400064, 0x0 },
@@ -775,3 +776,5 @@ grmon_command_t gr_run_cmd[] = {
 	{ 0x90000020, 0x0 },
 	{ 0xDEADDEAD, 0xDEADDEAD }
 };
+
+#endif /* _SCALEO */

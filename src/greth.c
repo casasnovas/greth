@@ -43,13 +43,8 @@ static void	print_usage(const char*	binary_name)
 		"\t%s run [--run-address/-r memory_address] (default to 0x00)"
 		"\n\t\t --ip/-i ip_address\n"
 		"or: "
-		"\t%s continue --ip/-i ip_address\n"
-		"or: "
-		"\t%s halt --ip/-i ip_address\n"
-		"or: "
 		"\t%s help\n",
-		binary_name, binary_name, binary_name,
-		binary_name, binary_name, binary_name);
+		binary_name, binary_name, binary_name, binary_name);
 }
 
 /**
@@ -78,8 +73,10 @@ static int	check_config(void)
 		if (config.data_size == 0)
 			config.data_size = 4;
 	}
+#ifdef _SCALEO
 	else if (config.action == RUN_ACTION) {
 	}
+#endif /* _SCALEO */
 	else
 		/* No action is specified */
 		return (1);
@@ -96,7 +93,9 @@ static struct option l_opts[] =	{
 	{"verbose",		no_argument,		0, 'v'},
 	{"big-endian",		no_argument,		0, 'b'},
 	{"check-copy",		no_argument,		0, 'c'},
+#ifdef _SCALEO
 	{"run-address",		required_argument,	0, 'r'},
+#endif /* _SCALEO */
 	{"memory-address",	required_argument,	0, 'm'},
 	{0,			0,			0,  0 }
 };
@@ -131,11 +130,14 @@ static int	treat_options(int argc, char** argv)
 		++argv;
 		--argc;
 	}
+#ifdef _SCALEO
+	/* Not portable, used on our specific platform with 4 leon3 processors */
 	else if (strncmp(argv[1], "run", 12) == 0) {
 		config.action = RUN_ACTION;
 		++argv;
 		--argc;
 	}
+#endif /* _SCALEO */
 
 	/* Parse the command line options in case of a write or read action */
 	while ((option = getopt_long(argc, argv, "f:bhi:l:m:r:vw:", l_opts, NULL)) != EOF) {
@@ -162,10 +164,12 @@ static int	treat_options(int argc, char** argv)
 			config.memory_address = strtoul(optarg, NULL, 0);
 			config.memory_address &= ~3;
 			break;
+#ifdef _SCALEO
 		case 'r':
 			config.run_address = strtoul(optarg, NULL, 0);
 			config.run_address &= ~3;
 			break;
+#endif /* _SCALEO */
 		case 'v':
 			config.verbose = true;
 			break;
@@ -222,10 +226,13 @@ int		main(int argc, char** argv)
 				goto error;
 		}
 	}
+#ifdef _SCALEO
+	/* Not portable... again */
 	else if (config.action == RUN_ACTION) {
 		if ((err_num = run_address()) !=0)
 			goto error;
 	}
+#endif /* _SCALEO */
 
 	/* Close the socket to the ethernet IP */
 	close_connections();

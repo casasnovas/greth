@@ -45,7 +45,10 @@
 
 # define WRITE_ACTION		1
 # define READ_ACTION		2
-# define RUN_ACTION		3
+
+# ifdef _SCALEO
+#  define RUN_ACTION		3
+# endif /* _SCALEO */
 
 /*
  * Arch not specific macros function
@@ -67,7 +70,9 @@ typedef struct			greth_conf_t {
 	char			big_endian;
 	char			check_copy;
 	unsigned int		sequence_number;
+# ifdef _SCALEO
 	unsigned int		run_address;
+# endif /* _SCALEO */
 	unsigned int		memory_address;
 	unsigned int		data_size;
 	unsigned int		word;
@@ -78,13 +83,14 @@ typedef struct			greth_conf_t {
 	};
 } greth_conf_t;
 
+extern greth_conf_t	config;
+
+# ifdef _SCALEO
 typedef struct		grmon_command_t {
 	unsigned int	address;
 	unsigned int	value;
 }			grmon_command_t;
-
-extern greth_conf_t	config;
 extern grmon_command_t	gr_run_cmd[];
-extern grmon_command_t	gr_debug_cmd[];
+# endif /* _SCALEO */
 
 #endif /* !GRETH_H_ */

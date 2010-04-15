@@ -1,7 +1,62 @@
-                       __  .__     
-   ___________   _____/  |_|  |__  
-  / ___\_  __ \_/ __ \   __\  |  \ 
+                       __  .__
+   ___________   _____/  |_|  |__
+  / ___\_  __ \_/ __ \   __\  |  \
  / /_/  >  | \/\  ___/|  | |   Y  \
  \___  /|__|    \___  >__| |___|  /
-/_____/             \/          \/ 
+/_____/             \/          \/
 
+
+Author: Quentin Casasnovas
+Licence: GPL2
+Version: 0.1
+
+1. Description
+~~~~~~~~~~~~~~
+  This small utility permits to read/write directly from/to a AHB/APB Bus in a
+embedded device using gaisler Greth ethernet IP. This allow you for example to
+dump RAM region, write to a particular register in an IP, or even write a
+complete file to memory.
+
+  This works originated from my final internship at Scaleo Chip, a fabless
+semiconductor company. I was working on a Linux-SMP kernel on leon3
+architecture and needed a way to dump the kernel directly to RAM. Before
+writing this utility, I had to transfer it using the serial port, which takes
+for ever if you need to transfer the kernel multiple times a day...
+
+  So this programms simply implements the EDCL protocol developped by Gaisler,
+and speacks directly to a greth IP to read/write on the bus. This could be a
+good start if you're planning on writing a free debugger for leon processors,
+feel free to let me know if you start such project, I'll be glad to work on it.
+
+2. Usage
+~~~~~~~~
+
+  I'll copy/paste here the usage from the binary itself, I think it's self
+explanatory. If there's something you don't understand, feel free to ask me,
+I'll probably add the explanations here too.
+
+Usage: ./greth read --ip/-i ip_address
+       	       [--memory-address/-m memory_address] (default to 0x40000000)
+	       [--length/-l length] (default to 4)
+	       [--big-endian/-b]
+	       [--verbose/-v]
+or: 	./greth write --ip/-i ip_address
+		[--memory-address/-m memory_address] (default to 0x40000000)
+	     	[[--file/-f filename]/[--word/-w word_value]] (default to -w 0x1234CAFE)
+		[--check-copy/-c] (not implemented yet)
+		[--big-endian/-b]
+		[--verbose/-v]
+or: 	./greth help
+
+3. Documentation
+~~~~~~~~~~~~~~~~
+  The code should be documented enough for anyone who knows a bit of C. If
+you'd like to read the documentation for the EDCL protocol from gaisler, it's
+described in their grip pdf documentation file, in the greth chapter (you can
+find it on their website http://www.gaisler.com in the download area).
+
+4. Miscellaneous
+~~~~~~~~~~~~~~~~
+  The ascii font used in INSTALL and README files is "graffiti" ans has been
+generated with the online ascii generator present at
+http://www.network-science.de/ascii/

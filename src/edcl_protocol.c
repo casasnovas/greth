@@ -201,6 +201,7 @@ int			send_word(void)
 	return (errno);
 }
 
+#ifdef _SCALEO
 int			set_debug_mode(void)
 {
 	unsigned int	i = 0;
@@ -247,7 +248,7 @@ int			run_address(void)
 		config.memory_address);
 	return (errno);
 }
-
+#endif /* _SCALEO */
 
 /**
  * Send a file to be written at config.memory_address
